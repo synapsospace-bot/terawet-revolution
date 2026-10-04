@@ -7,9 +7,9 @@ import { ElevenLabsWidget, triggerElevenLabsCall } from "@/components/ElevenLabs
 import heroImage from "@/assets/hydrogel-hero.jpg";
 import materialImage from "@/assets/hydrogel-material.jpg";
 import stageAbsorptionImg from "@/assets/stage-absorption.jpg";
-import stageReservoirImg from "@/assets/stage-reservoir.png";
+import stageReservoirImg from "@/assets/stage-reservoir.jpg";
 import stageOsmosisImg from "@/assets/stage-osmosis.jpg";
-import stageLifecycleImg from "@/assets/stage-lifecycle.png";
+import stageLifecycleImg from "@/assets/stage-lifecycle.jpg";
 import WovenGlassButton from "@/components/ui/woven-glass-button";
 
 export const Route = createFileRoute("/")({
@@ -817,12 +817,8 @@ function Home() {
         </div>
       </footer>
 
-      {/* Floating ElevenLabs Woven Glass Voice Agent Trigger */}
+      {/* Floating Woven Glass AI Consultation Trigger */}
       <div className="voice-widget">
-        <div className="voice-widget-pill" onClick={() => triggerElevenLabsCall()}>
-          <span className="voice-widget-pill-dot" />
-          <span>{t.voice}</span>
-        </div>
         <div className="voice-glass-wrapper">
           <WovenGlassButton
             className="voice-woven-btn"

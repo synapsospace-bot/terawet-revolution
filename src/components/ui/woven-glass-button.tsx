@@ -237,7 +237,7 @@ function createWovenRenderer(makeCanvas){
    ctx.restore();
   }
   if(open>.2)ellipseGlow(ctx,0,0,28,28,[[0,`rgba(255,255,255,${Math.min(1,open*1.1)*alpha})`],[.4,`rgba(208,243,255,${open*.25*alpha})`],[1,'rgba(178,230,255,0)']]);
-  if(collapse<.55){ctx.save();ctx.globalAlpha=1-smooth(collapse/.55);ctx.fillStyle='#fff';ctx.font='500 27px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,59,147,.28)';ctx.shadowBlur=3;ctx.shadowOffsetY=1;ctx.fillText(labelText || 'AI VOICE',-16,1);ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.strokeStyle='#fff';ctx.lineWidth=1.8;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(92,0);ctx.lineTo(115,0);ctx.moveTo(106,-9);ctx.lineTo(115,0);ctx.lineTo(106,9);ctx.stroke();ctx.restore()}
+  if(collapse<.55){ctx.save();ctx.globalAlpha=1-smooth(collapse/.55);ctx.fillStyle='#fff';ctx.font='500 27px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,59,147,.28)';ctx.shadowBlur=3;ctx.shadowOffsetY=1;if(labelText){ctx.fillText(labelText,-16,1);}ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.strokeStyle='#fff';ctx.lineWidth=1.8;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();const ox=labelText?0:-105;ctx.moveTo(92+ox,0);ctx.lineTo(115+ox,0);ctx.moveTo(106+ox,-9);ctx.lineTo(115+ox,0);ctx.lineTo(106+ox,9);ctx.stroke();ctx.restore()}
   ctx.restore();
  }
  return {draw,dispose};
