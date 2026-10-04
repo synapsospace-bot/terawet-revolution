@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Menu, Mic, Minus, Plus, Volume2, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HydrogelScene } from "@/components/HydrogelScene";
-import { ElevenLabsWidget, triggerElevenLabsCall } from "@/components/ElevenLabsWidget";
+import { ElevenLabsWidget, triggerElevenLabsCall, closeElevenLabsCall } from "@/components/ElevenLabsWidget";
 import heroImage from "@/assets/hydrogel-hero.jpg";
 import materialImage from "@/assets/hydrogel-material.jpg";
 import stageAbsorptionImg from "@/assets/stage-absorption.jpg";
@@ -211,10 +211,23 @@ function Home() {
   const [quoteProduct, setQuoteProduct] = useState<string | null>(null);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [isAgentActive, setIsAgentActive] = useState(false);
+
+  useEffect(() => {
+    const handleOpened = () => setIsAgentActive(true);
+    const handleClosed = () => setIsAgentActive(false);
+    window.addEventListener("terawet:agent-opened", handleOpened);
+    window.addEventListener("terawet:agent-closed", handleClosed);
+    return () => {
+      window.removeEventListener("terawet:agent-opened", handleOpened);
+      window.removeEventListener("terawet:agent-closed", handleClosed);
+    };
+  }, []);
 
   const stageMedia = [
     {
       image: stageAbsorptionImg,
+      video: "/videos/terawet-care.mp4",
       fig: "FIG. 01 // DRY CRYSTAL MATRIX",
       tag: "CRYSTAL GRANULOMETRY // 0.1–2.0 MM",
       alt: "Microstructure of dry superabsorbent Terawet crystal granules",
@@ -232,6 +245,7 @@ function Home() {
     },
     {
       image: stageOsmosisImg,
+      video: "/videos/terawet-care.mp4",
       fig: "FIG. 03 // ROOT OSMOTIC EXCHANGE",
       tag: "CAPILLARY ROOT-HAIR JUNCTION",
       alt: "Plant root system drawing moisture directly from Terawet hydrogel",
@@ -240,6 +254,7 @@ function Home() {
     },
     {
       image: stageLifecycleImg,
+      video: "/videos/terawet-gel.mp4",
       fig: "FIG. 04 // 7-10 YEAR PERENNIAL MATRIX",
       tag: "SOIL STRUCTURE & MICROBIOME BUFFER",
       alt: "Long-term soil ecosystem and deep root resilience with Terawet",
@@ -409,7 +424,7 @@ function Home() {
                     className={`science-slide ${idx === stage ? "active" : ""}`}
                     aria-hidden={idx !== stage}
                   >
-                    {idx === 1 && showVideo ? (
+                    {item.video && showVideo ? (
                       <video
                         src={item.video}
                         autoPlay
@@ -431,6 +446,10 @@ function Home() {
                   </div>
                 ))}
 
+                {/* Pioneer-style Dynamic Scanline and CRT Overlay */}
+                <div className="science-scanline" aria-hidden="true" />
+                <div className="science-grid-overlay" aria-hidden="true" />
+
                 {/* HUD Corner Indicators */}
                 <div className="image-corner top-left">
                   {stageMedia[stage].fig}
@@ -444,9 +463,9 @@ function Home() {
                       type="button"
                       className="science-video-toggle"
                       onClick={() => setShowVideo(!showVideo)}
-                      aria-label="Toggle video / photo"
+                      aria-label="Toggle video / 3D photo"
                     >
-                      {showVideo ? `📷 ${t.photoView}` : `▶ ${t.videoView}`}
+                      {showVideo ? `🔬 3D HUD VIEW` : `▶ LIVE BIO-VIDEO`}
                     </button>
                   )}
                 </div>
@@ -572,6 +591,7 @@ function Home() {
                     ? "Гранульований гідрогель фракції 1-4 мм для внесення у ґрунт, сади, виноградники та відкриті поля."
                     : "Granular hydrogel (1-4 mm) for open-field soil incorporation, orchards, vineyards, and root-zone retention.",
                   image: productT400Img,
+                  video: "/videos/terawet-care.mp4",
                   imageClass: "product-image-a",
                   applications: "FIELDS / ORCHARDS / VINEYARDS / FORESTRY",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -585,6 +605,7 @@ function Home() {
                     ? "Дрібнодисперсний порошок для обволікання насіння, вмочування коріння саджанців та розсади."
                     : "Micro-powder formulation for seed coating, bare-root dipping, transplant nurseries, and hydroseeding.",
                   image: productT100Img,
+                  video: "/videos/terawet-gel.mp4",
                   imageClass: "product-image-b",
                   applications: "SEEDS / ROOT DIPPING / NURSERIES / HYDROPONICS",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -600,7 +621,21 @@ function Home() {
                       height={1024}
                       alt={`${product.code} hydrogel material close-up`}
                     />
+                    {product.video && (
+                      <video
+                        className="product-visual-video"
+                        src={product.video}
+                        loop
+                        muted
+                        playsInline
+                        autoPlay
+                      />
+                    )}
+                    <div className="product-scanline-overlay" aria-hidden="true" />
                     <span className="product-visual-label">TERA-WET / {product.code}</span>
+                    <span className="product-video-badge">
+                      <span className="product-video-dot" /> LIVE 3D TELEMETRY
+                    </span>
                   </div>
 
                   <div className="product-info">
@@ -821,12 +856,31 @@ function Home() {
 
       {/* Floating Woven Glass AI Consultation Trigger */}
       <div className="voice-widget">
+        {isAgentActive && (
+          <button
+            type="button"
+            className="voice-close-floating-pill"
+            onClick={() => {
+              closeElevenLabsCall();
+              setIsAgentActive(false);
+            }}
+            aria-label="Закрити AI-Агента"
+          >
+            ✕ ЗАКРИТИ AI-АГЕНТА
+          </button>
+        )}
         <div className="voice-glass-wrapper">
           <WovenGlassButton
             className="voice-woven-btn"
-            label="AI-Agent"
+            label={isAgentActive ? "ЗАКРИТИ" : "AI-Agent"}
             onActivate={() => {
-              triggerElevenLabsCall();
+              if (isAgentActive) {
+                closeElevenLabsCall();
+                setIsAgentActive(false);
+              } else {
+                triggerElevenLabsCall();
+                setIsAgentActive(true);
+              }
             }}
           />
         </div>

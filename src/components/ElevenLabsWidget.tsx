@@ -65,8 +65,56 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             pointer-events: auto !important;
             z-index: 10000 !important;
           }
+
+          /* Prominent Close Button inside the active sheet */
+          #custom-agent-close-btn {
+            position: absolute !important;
+            top: 14px !important;
+            right: 14px !important;
+            z-index: 99999 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            background: rgba(6, 22, 16, 0.92) !important;
+            border: 1px solid rgba(16, 185, 129, 0.6) !important;
+            color: #10b981 !important;
+            font-family: inherit !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.1em !important;
+            text-transform: uppercase !important;
+            padding: 8px 16px !important;
+            border-radius: 9999px !important;
+            cursor: pointer !important;
+            backdrop-filter: blur(12px) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+            transition: all 0.2s ease !important;
+          }
+          #custom-agent-close-btn:hover {
+            background: rgba(239, 68, 68, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.8) !important;
+            color: #ef4444 !important;
+            transform: scale(1.05) !important;
+          }
         `;
         el.shadowRoot.appendChild(style);
+      }
+
+      // Inject close button into .sheet if active
+      const sheet = el.shadowRoot.querySelector(".sheet") as HTMLElement | null;
+      if (sheet && !sheet.querySelector("#custom-agent-close-btn")) {
+        const closeBtn = document.createElement("button");
+        closeBtn.id = "custom-agent-close-btn";
+        closeBtn.setAttribute("type", "button");
+        closeBtn.setAttribute("aria-label", "Закрити AI-Агента");
+        closeBtn.innerHTML = `✕ ЗАКРИТИ`;
+        closeBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeElevenLabsCall();
+        };
+        sheet.appendChild(closeBtn);
       }
 
       // Direct element hiding fallback for any dynamically rendered nodes
@@ -122,14 +170,30 @@ export function triggerElevenLabsCall() {
         const buttons = widget.shadowRoot.querySelectorAll("button");
         buttons.forEach((btn) => {
           const label = btn.getAttribute("aria-label") || "";
-          if (!label.includes("Dismiss") && !label.includes("Close")) {
+          if (!label.includes("Dismiss") && !label.includes("Close") && !label.includes("Закрити")) {
             btn.click();
           }
         });
       }
+      window.dispatchEvent(new CustomEvent("terawet:agent-opened"));
     } else if (retries > 0) {
       setTimeout(() => attempt(retries - 1), 250);
     }
   };
   attempt();
+}
+
+export function closeElevenLabsCall() {
+  document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
+  const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
+  if (widget) {
+    widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
+    if (widget.shadowRoot) {
+      const endButtons = widget.shadowRoot.querySelectorAll(
+        'button[aria-label*="end" i], button[aria-label*="End" i], button[aria-label*="Close" i], button[aria-label*="Dismiss" i]'
+      );
+      endButtons.forEach((btn) => (btn as HTMLElement).click());
+    }
+  }
+  window.dispatchEvent(new CustomEvent("terawet:agent-closed"));
 }
