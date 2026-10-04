@@ -45,14 +45,14 @@ const copy = {
     scroll: "ГОРТАЙТЕ ВНИЗ",
     scienceEyebrow: "01 / ПІД ПОВЕРХНЕЮ",
     scienceTitle: "НАУКА КЛІТИННОГО\nЗВОЛОЖЕННЯ",
-    scienceIntro: "Мікроскопична зміна з колосальним впливом на врожайність. Просторова полімерна матриця утримує до 400 разів більше води за власну вагу.",
+    scienceIntro: "Мікроскопічна зміна з колосальним впливом на врожайність. Просторова полімерна матриця утримує до 400 разів більше води за власну вагу.",
     productEyebrow: "02 / ПРОДУКТОВА ЛІНІЙКА",
     productTitle: "СТВОРЕНО ДЛЯ\nКОЖНОГО КОРЕНЯ.",
     productIntro: "Два високоточних формати суперабсорбенту. Одна мета: змусити кожну краплину води працювати на максимальний результат.",
     quote: "Замовити розрахунок",
     calculate: "Розрахувати норму",
     calcEyebrow: "03 / ПЛАНУВАННЯ ВНЕСЕННЯ",
-    calcTitle: "ПЛАНУЙТЕ\nВАШ УРОЖАЙ.",
+    calcTitle: "ПЛАНУЙТЕ\nВАШ ВРОЖАЙ.",
     calcIntro: "Орієнтовний розрахунок для вашої площі. Точна норма залежить від типу ґрунту, культури, кліматичної зони та способу внесення.",
     crop: "КУЛЬТУРА / СФЕРА ЗАСТОСУВАННЯ",
     area: "ПЛОЩА ОБРОБКИ",
@@ -164,7 +164,7 @@ const copy = {
     quote: "Запитване за цена",
     calculate: "Изчислете нормата",
     calcEyebrow: "03 / ПЛАНИРАНЕ НА ПРИЛОЖЕНИЕТО",
-    calcTitle: "ПЛАНИРАЙТЕ\nРЕЗУЛТАТА СИ.",
+    calcTitle: "ПЛАНИРАЙТЕ\nВАШАТА РЕКОЛТА.",
     calcIntro: "Ориентировъчно изчисление за вашата площ. Окончателната доза зависи от почвата, културата, климата и метода на внасяне.",
     crop: "КУЛТУРА / ОБЛАСТ НА ПРИЛОЖЕНИЕ",
     area: "ОБРАБОТВАЕМА ПЛОЩ",
@@ -591,7 +591,6 @@ function Home() {
                     ? "Гранульований гідрогель фракції 1-4 мм для внесення у ґрунт, сади, виноградники та відкриті поля."
                     : "Granular hydrogel (1-4 mm) for open-field soil incorporation, orchards, vineyards, and root-zone retention.",
                   image: productT400Img,
-                  video: "/videos/terawet-care.mp4",
                   imageClass: "product-image-a",
                   applications: "FIELDS / ORCHARDS / VINEYARDS / FORESTRY",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -605,7 +604,6 @@ function Home() {
                     ? "Дрібнодисперсний порошок для обволікання насіння, вмочування коріння саджанців та розсади."
                     : "Micro-powder formulation for seed coating, bare-root dipping, transplant nurseries, and hydroseeding.",
                   image: productT100Img,
-                  video: "/videos/terawet-gel.mp4",
                   imageClass: "product-image-b",
                   applications: "SEEDS / ROOT DIPPING / NURSERIES / HYDROPONICS",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -621,16 +619,6 @@ function Home() {
                       height={1024}
                       alt={`${product.code} hydrogel material close-up`}
                     />
-                    {product.video && (
-                      <video
-                        className="product-visual-video"
-                        src={product.video}
-                        loop
-                        muted
-                        playsInline
-                        autoPlay
-                      />
-                    )}
                     <div className="product-scanline-overlay" aria-hidden="true" />
                     <span className="product-visual-label">TERA-WET / {product.code}</span>
                     <span className="product-video-badge">
@@ -653,13 +641,27 @@ function Home() {
                       <strong>{product.pack}</strong>
                     </div>
 
-                    <Button
-                      className="product-action"
-                      onClick={() => setQuoteProduct(`TERA-WET ${product.code}`)}
-                    >
-                      {t.quote}
-                      <ArrowUpRight />
-                    </Button>
+                    <div className="product-actions-group">
+                      <a
+                        href="https://t.me/Terawet_bot"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="product-order-tg-btn"
+                        aria-label={`Order TERA-WET ${product.code} via Telegram Bot`}
+                      >
+                        <span>Order-Terawet</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </a>
+
+                      <button
+                        type="button"
+                        className="product-action-secondary"
+                        onClick={() => setQuoteProduct(`TERA-WET ${product.code}`)}
+                      >
+                        <span>{t.quote}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </article>
               ))}

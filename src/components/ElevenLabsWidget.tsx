@@ -16,6 +16,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       widget.setAttribute("data-placement", "bottom-left");
       widget.setAttribute("data-open", "false");
       widget.style.setProperty("display", "none", "important");
+      widget.style.setProperty("visibility", "hidden", "important");
       document.body.appendChild(widget);
     } else {
       widget.setAttribute("placement", "bottom-left");
@@ -31,9 +32,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       document.body.appendChild(script);
     }
 
-    // 3. Bulletproof hiding of idle assistant greeting card ('Потрібна допомога?'),
-    // circular launcher buttons, and 'Powered by ElevenAgents' banners.
-    const hideIdleWidgets = () => {
+    // 3. Dynamic styling and controls inside Shadow DOM
+    const updateShadowDOM = () => {
       const el = document.querySelector("elevenlabs-convai") as HTMLElement | null;
       if (!el) return;
 
@@ -43,6 +43,11 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         el.style.setProperty("visibility", "hidden", "important");
         el.style.setProperty("pointer-events", "none", "important");
         el.style.setProperty("opacity", "0", "important");
+      } else {
+        el.style.setProperty("display", "block", "important");
+        el.style.setProperty("visibility", "visible", "important");
+        el.style.setProperty("pointer-events", "auto", "important");
+        el.style.setProperty("opacity", "1", "important");
       }
 
       if (!el.shadowRoot) return;
@@ -52,12 +57,10 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         const style = document.createElement("style");
         style.id = "clean-assistant-style";
         style.textContent = `
-          /* Completely hide any idle launcher card, bubble, circular button, or credit footer */
+          /* Hide idle popup cards, bubbles, and credit footers */
           [class*="rounded-sheet"],
           [class*="rounded-compact-sheet"],
           [class*="rounded-bubble"],
-          button.rounded-full,
-          button[aria-label="Open chat"],
           p[class*="whitespace-nowrap"],
           [class*="terms"] {
             display: none !important;
@@ -69,9 +72,50 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             max-width: 0 !important;
             max-height: 0 !important;
             overflow: hidden !important;
+          }
+
+          /* Keep launcher button in DOM for programmatic clicks without visual presence */
+          button.rounded-full,
+          button[aria-label="Open chat"] {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            width: 1px !important;
+            height: 1px !important;
             position: absolute !important;
-            bottom: -9999px !important;
-            left: -9999px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+          }
+
+          /* Active sheet styling anchored above the bottom-left trigger button */
+          :host([data-open="true"]) .sheet {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            position: fixed !important;
+            left: 20px !important;
+            bottom: 84px !important;
+            right: auto !important;
+            z-index: 10000 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.25) !important;
+          }
+
+          /* Hide sheet when agent is not open */
+          :host([data-open="false"]) .sheet,
+          :host(:not([data-open="true"])) .sheet {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+          }
+
+          @media (max-width: 600px) {
+            :host([data-open="true"]) .sheet {
+              left: 10px !important;
+              bottom: 74px !important;
+              right: auto !important;
+              max-width: calc(100vw - 20px) !important;
+            }
           }
 
           /* Prominent Close Button inside the active sheet */
@@ -110,7 +154,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         el.shadowRoot.appendChild(style);
       }
 
-      // Inject close button into .sheet or active card if active
+      // Inject close button into .sheet if active
       const sheet = el.shadowRoot.querySelector(".sheet") as HTMLElement | null;
       if (sheet && !sheet.querySelector("#custom-agent-close-btn")) {
         const closeBtn = document.createElement("button");
@@ -129,82 +173,25 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         closeBtn.addEventListener("pointerdown", handleBtnClose);
         sheet.appendChild(closeBtn);
       }
-
-      // Attach capture-phase listener to shadowRoot for any close/end button
-      const rootAny = el.shadowRoot as unknown as { _listenersAttached?: boolean };
-      if (!rootAny._listenersAttached) {
-        rootAny._listenersAttached = true;
-        const interceptClose = (e: Event) => {
-          const target = e.target as HTMLElement | null;
-          if (!target) return;
-          const btn = target.closest("button");
-          if (btn) {
-            const id = btn.id || "";
-            const label = (btn.getAttribute("aria-label") || "").toLowerCase();
-            const text = (btn.textContent || "").toLowerCase();
-            if (
-              id === "custom-agent-close-btn" ||
-              label.includes("close") ||
-              label.includes("закрити") ||
-              label.includes("dismiss") ||
-              label.includes("end") ||
-              text.includes("закрити")
-            ) {
-              e.preventDefault();
-              e.stopPropagation();
-              closeElevenLabsCall();
-            }
-          }
-        };
-        el.shadowRoot.addEventListener("click", interceptClose, true);
-        el.shadowRoot.addEventListener("pointerdown", interceptClose, true);
-      }
-
-      // Direct element hiding fallback for any dynamically rendered idle nodes
-      const elementsToHide = el.shadowRoot.querySelectorAll(
-        '[class*="rounded-sheet"], [class*="rounded-compact-sheet"], [class*="rounded-bubble"], button.rounded-full, p[class*="whitespace-nowrap"]'
-      );
-      elementsToHide.forEach((node) => {
-        const htmlNode = node as HTMLElement;
-        if (!htmlNode.classList.contains("sheet") && !htmlNode.closest(".sheet")) {
-          htmlNode.style.setProperty("display", "none", "important");
-          htmlNode.style.setProperty("opacity", "0", "important");
-          htmlNode.style.setProperty("visibility", "hidden", "important");
-          htmlNode.style.setProperty("pointer-events", "none", "important");
-          htmlNode.style.setProperty("position", "absolute", "important");
-          htmlNode.style.setProperty("bottom", "-9999px", "important");
-        }
-      });
     };
 
     let observer: MutationObserver | null = null;
     const attachObserver = () => {
       const el = document.querySelector("elevenlabs-convai") as HTMLElement | null;
       if (el && el.shadowRoot && !observer) {
-        hideIdleWidgets();
-        observer = new MutationObserver(() => hideIdleWidgets());
+        updateShadowDOM();
+        observer = new MutationObserver(() => updateShadowDOM());
         observer.observe(el.shadowRoot, { childList: true, subtree: true, attributes: true });
       }
     };
 
     const interval = setInterval(() => {
-      hideIdleWidgets();
+      updateShadowDOM();
       attachObserver();
     }, 150);
 
-    const handleDocumentClick = (e: MouseEvent) => {
-      const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
-      if (!widget || widget.getAttribute("data-open") !== "true") return;
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      if (target.closest(".voice-widget") || target.closest("elevenlabs-convai")) return;
-      closeElevenLabsCall();
-    };
-    document.addEventListener("click", handleDocumentClick);
-
     return () => {
       clearInterval(interval);
-      document.removeEventListener("click", handleDocumentClick);
       if (observer) observer.disconnect();
     };
   }, [agentId]);
@@ -213,7 +200,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
 }
 
 export function triggerElevenLabsCall() {
-  const attempt = (retries = 8) => {
+  const attempt = (retries = 10) => {
     const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
     if (widget) {
       widget.setAttribute("data-open", "true");
@@ -233,15 +220,15 @@ export function triggerElevenLabsCall() {
       if (widget.shadowRoot) {
         const buttons = widget.shadowRoot.querySelectorAll("button");
         buttons.forEach((btn) => {
-          const label = btn.getAttribute("aria-label") || "";
-          if (!label.includes("Dismiss") && !label.includes("Close") && !label.includes("Закрити") && btn.id !== "custom-agent-close-btn") {
+          const label = (btn.getAttribute("aria-label") || "").toLowerCase();
+          if (!label.includes("dismiss") && !label.includes("close") && !label.includes("закрити") && btn.id !== "custom-agent-close-btn") {
             btn.click();
           }
         });
       }
       window.dispatchEvent(new CustomEvent("terawet:agent-opened"));
     } else if (retries > 0) {
-      setTimeout(() => attempt(retries - 1), 250);
+      setTimeout(() => attempt(retries - 1), 200);
     }
   };
   attempt();
