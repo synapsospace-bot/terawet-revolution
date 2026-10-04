@@ -10,6 +10,8 @@ import stageAbsorptionImg from "@/assets/stage-absorption.jpg";
 import stageReservoirImg from "@/assets/stage-reservoir.jpg";
 import stageOsmosisImg from "@/assets/stage-osmosis.jpg";
 import stageLifecycleImg from "@/assets/stage-lifecycle.jpg";
+import productT400Img from "@/assets/product-t400.jpg";
+import productT100Img from "@/assets/product-t100.jpg";
 import WovenGlassButton from "@/components/ui/woven-glass-button";
 
 export const Route = createFileRoute("/")({
@@ -569,7 +571,7 @@ function Home() {
                     : lang === "UA"
                     ? "Гранульований гідрогель фракції 1-4 мм для внесення у ґрунт, сади, виноградники та відкриті поля."
                     : "Granular hydrogel (1-4 mm) for open-field soil incorporation, orchards, vineyards, and root-zone retention.",
-                  image: materialImage,
+                  image: productT400Img,
                   imageClass: "product-image-a",
                   applications: "FIELDS / ORCHARDS / VINEYARDS / FORESTRY",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -582,7 +584,7 @@ function Home() {
                     : lang === "UA"
                     ? "Дрібнодисперсний порошок для обволікання насіння, вмочування коріння саджанців та розсади."
                     : "Micro-powder formulation for seed coating, bare-root dipping, transplant nurseries, and hydroseeding.",
-                  image: materialImage,
+                  image: productT100Img,
                   imageClass: "product-image-b",
                   applications: "SEEDS / ROOT DIPPING / NURSERIES / HYDROPONICS",
                   pack: "1 KG / 5 KG / 25 KG"
@@ -822,7 +824,7 @@ function Home() {
         <div className="voice-glass-wrapper">
           <WovenGlassButton
             className="voice-woven-btn"
-            label="AI VOICE"
+            label="AI-Agent"
             onActivate={() => {
               triggerElevenLabsCall();
             }}

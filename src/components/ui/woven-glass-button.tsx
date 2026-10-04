@@ -13,7 +13,7 @@ export interface WovenGlassButtonProps {
 /** Blue glass capsule → woven sphere on hover → blooming ribbons on click.
  * Procedural WebGL ribbons; no images, network requests or animation dependencies.
  */
-export default function WovenGlassButton({className,style,onActivate,label = "AI VOICE"}: WovenGlassButtonProps) {
+export default function WovenGlassButton({className,style,onActivate,label = "AI-Agent"}: WovenGlassButtonProps) {
   const canvasRef=React.useRef<HTMLCanvasElement>(null);
   const buttonRef=React.useRef<HTMLButtonElement>(null);
   const onActivateRef=React.useRef(onActivate);
@@ -222,7 +222,7 @@ function createWovenRenderer(makeCanvas){
  }
  function gathering(ctx,progress,alpha){petals(ctx,0,alpha,progress)}
  function dispose(){for(const mesh of meshCache.values())gl.deleteBuffer(mesh.buffer);meshCache.clear();gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);gl.getExtension('WEBGL_lose_context')?.loseContext()}
- function draw(ctx,state={},w=800,h=620,labelText='AI VOICE'){
+ function draw(ctx,state={},w=800,h=620,labelText='AI-Agent'){
   const {collapse=0,open=0,press=0,alpha=1}=state;
   ctx.clearRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.scale(w/800,w/800);
   ellipseGlow(ctx,0,100,150+open*20,42,[[0,'rgba(46,131,234,.23)'],[.53,'rgba(64,149,245,.1)'],[1,'rgba(64,149,245,0)']]);
