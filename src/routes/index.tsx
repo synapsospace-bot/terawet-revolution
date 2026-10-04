@@ -808,8 +808,31 @@ function Home() {
               <a className="contact-email" href="mailto:terawet.original@gmail.com">
                 terawet.original@gmail.com <ArrowUpRight size={24} />
               </a>
+            </div>
 
-              <div className="contact-social">
+            <div className="contact-right">
+              <form className="contact-form" onSubmit={sendInquiry}>
+                <span className="form-kicker">START A CONVERSATION <span>↗</span></span>
+                
+                <label htmlFor="contact-name">01 / {t.name}</label>
+                <input id="contact-name" name="name" placeholder={t.name} required minLength={2} />
+
+                <label htmlFor="contact-email">02 / {t.email}</label>
+                <input id="contact-email" name="email" type="email" placeholder="example@agri-corp.com" required />
+
+                <label htmlFor="contact-message">03 / {t.message}</label>
+                <textarea id="contact-message" name="message" placeholder={t.message} rows={3} required minLength={8} />
+
+                <Button type="submit" className="button-bright form-submit">
+                  {t.send}
+                  <ArrowUpRight />
+                </Button>
+              </form>
+
+              <div className="contact-social contact-social-right">
+                <a href="https://t.me/Terawet_bot" target="_blank" rel="noreferrer">
+                  TELEGRAM <ArrowUpRight size={15} />
+                </a>
                 <a href="https://wa.me/16195160130" target="_blank" rel="noreferrer">
                   WHATSAPP <ArrowUpRight size={15} />
                 </a>
@@ -821,24 +844,6 @@ function Home() {
                 </a>
               </div>
             </div>
-
-            <form className="contact-form" onSubmit={sendInquiry}>
-              <span className="form-kicker">START A CONVERSATION <span>↗</span></span>
-              
-              <label htmlFor="contact-name">01 / {t.name}</label>
-              <input id="contact-name" name="name" placeholder={t.name} required minLength={2} />
-
-              <label htmlFor="contact-email">02 / {t.email}</label>
-              <input id="contact-email" name="email" type="email" placeholder="example@agri-corp.com" required />
-
-              <label htmlFor="contact-message">03 / {t.message}</label>
-              <textarea id="contact-message" name="message" placeholder={t.message} rows={3} required minLength={8} />
-
-              <Button type="submit" className="button-bright form-submit">
-                {t.send}
-                <ArrowUpRight />
-              </Button>
-            </form>
           </div>
         </section>
       </main>

@@ -11,7 +11,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
     if (!widget) {
       widget = document.createElement("elevenlabs-convai");
       widget.setAttribute("agent-id", agentId);
-      widget.setAttribute("data-theme", "dark");
+      widget.setAttribute("data-theme", "light");
       widget.setAttribute("placement", "bottom-left");
       widget.setAttribute("data-placement", "bottom-left");
       widget.setAttribute("always-expanded", "true");
@@ -23,7 +23,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       document.body.appendChild(widget);
     } else {
       widget.setAttribute("agent-id", agentId);
-      widget.setAttribute("data-theme", "dark");
+      widget.setAttribute("data-theme", "light");
       widget.setAttribute("placement", "bottom-left");
       widget.setAttribute("data-placement", "bottom-left");
       widget.setAttribute("always-expanded", "true");
@@ -90,7 +90,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             position: absolute !important;
           }
 
-          /* Active sheet styling anchored cleanly in bottom-left above the trigger button */
+          /* Active sheet styling: clean white card with emerald branding and crystal clear readability */
           .sheet {
             pointer-events: auto !important;
             display: flex !important;
@@ -105,10 +105,37 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             max-height: calc(100vh - 110px) !important;
             z-index: 10001 !important;
             border-radius: 24px !important;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.3) !important;
-            border: 1px solid rgba(16, 185, 129, 0.4) !important;
-            background: #061610 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(16, 185, 129, 0.3) !important;
+            border: 2px solid rgba(16, 185, 129, 0.5) !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
             overflow: hidden !important;
+          }
+
+          /* Ensure all typography inside chat is crystal clear with strong contrast */
+          .sheet p,
+          .sheet span,
+          .sheet div,
+          .sheet [class*="markdown"],
+          .sheet [class*="markdown"] * {
+            color: #0f172a !important;
+          }
+
+          /* Header and scrollable area in crisp white */
+          .sheet [class*="bg-base"] {
+            background-color: #ffffff !important;
+          }
+          .sheet div[class*="overflow-y-auto"] {
+            background-color: #ffffff !important;
+          }
+
+          /* Text input field styling */
+          .sheet textarea {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+          }
+          .sheet textarea::placeholder {
+            color: #64748b !important;
           }
 
           :host([data-open="false"]) .sheet,
