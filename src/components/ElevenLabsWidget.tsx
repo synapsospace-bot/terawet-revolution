@@ -28,13 +28,17 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
 }
 
 export function triggerElevenLabsCall() {
-  const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
-  if (widget) {
-    widget.click();
-    // In case there is an internal shadow root button
-    const innerBtn = widget.shadowRoot?.querySelector("button");
-    if (innerBtn) {
-      innerBtn.click();
+  const attempt = (retries = 8) => {
+    const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
+    if (widget) {
+      widget.click();
+      const innerBtn = widget.shadowRoot?.querySelector("button");
+      if (innerBtn) {
+        innerBtn.click();
+      }
+    } else if (retries > 0) {
+      setTimeout(() => attempt(retries - 1), 250);
     }
-  }
+  };
+  attempt();
 }

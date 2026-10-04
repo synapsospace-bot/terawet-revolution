@@ -6,6 +6,11 @@ import { HydrogelScene } from "@/components/HydrogelScene";
 import { ElevenLabsWidget, triggerElevenLabsCall } from "@/components/ElevenLabsWidget";
 import heroImage from "@/assets/hydrogel-hero.jpg";
 import materialImage from "@/assets/hydrogel-material.jpg";
+import stageAbsorptionImg from "@/assets/stage-absorption.jpg";
+import stageReservoirImg from "@/assets/stage-reservoir.png";
+import stageOsmosisImg from "@/assets/stage-osmosis.jpg";
+import stageLifecycleImg from "@/assets/stage-lifecycle.png";
+import WovenGlassButton from "@/components/ui/woven-glass-button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +67,8 @@ const copy = {
     voiceDesc: "Натисніть для прямої голосової консультації з нашим інтелектуальним асистентом.",
     voiceCallAction: "Почати голосову розмову",
     getInTouch: "Зв’язатися з нами",
+    photoView: "ФОТО МАТРИЦЯ",
+    videoView: "ВІДЕО ТЕСТ НАБРЯКАННЯ",
     menu: "Меню",
     close: "Закрити",
     stages: [
@@ -116,6 +123,8 @@ const copy = {
     voiceDesc: "Tap to initiate real-time conversational voice consultation with our AI agronomist.",
     voiceCallAction: "Start Voice Consultation",
     getInTouch: "Get in Touch",
+    photoView: "PHOTO MATRIX",
+    videoView: "LAB SWELLING VIDEO",
     menu: "Menu",
     close: "Close",
     stages: [
@@ -170,6 +179,8 @@ const copy = {
     voiceDesc: "Натиснете за директна гласова консултация в реално време с нашия изкуствен интелект.",
     voiceCallAction: "Започнете гласов разговор",
     getInTouch: "Свържете се с нас",
+    photoView: "ФОТО МАТРИЦА",
+    videoView: "ВИДЕО ТЕСТ НАБЪБВАНЕ",
     menu: "Меню",
     close: "Затворете",
     stages: [
@@ -197,6 +208,43 @@ function Home() {
   const [unit, setUnit] = useState<"ha" | "m²">("ha");
   const [quoteProduct, setQuoteProduct] = useState<string | null>(null);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+
+  const stageMedia = [
+    {
+      image: stageAbsorptionImg,
+      fig: "FIG. 01 // DRY CRYSTAL MATRIX",
+      tag: "CRYSTAL GRANULOMETRY // 0.1–2.0 MM",
+      alt: "Microstructure of dry superabsorbent Terawet crystal granules",
+      reticle: { top: "42%", left: "48%" },
+      metricTag: "SWELL VELOCITY: < 15 MIN",
+    },
+    {
+      image: stageReservoirImg,
+      video: "/videos/terawet-gel.mp4",
+      fig: "FIG. 02 // CAPILLARY WATER RESERVOIR",
+      tag: "CROSS-LINKED HYDROGEL // 400X EXPANSION",
+      alt: "Hydrated Terawet polymer holding water in soil capillary reservoir",
+      reticle: { top: "52%", left: "50%" },
+      metricTag: "RETENTION: 400 L / 1 KG",
+    },
+    {
+      image: stageOsmosisImg,
+      fig: "FIG. 03 // ROOT OSMOTIC EXCHANGE",
+      tag: "CAPILLARY ROOT-HAIR JUNCTION",
+      alt: "Plant root system drawing moisture directly from Terawet hydrogel",
+      reticle: { top: "38%", left: "54%" },
+      metricTag: "WATER STRESS: -50% IRRIGATION",
+    },
+    {
+      image: stageLifecycleImg,
+      fig: "FIG. 04 // 7-10 YEAR PERENNIAL MATRIX",
+      tag: "SOIL STRUCTURE & MICROBIOME BUFFER",
+      alt: "Long-term soil ecosystem and deep root resilience with Terawet",
+      reticle: { top: "48%", left: "46%" },
+      metricTag: "SOIL LIFECYCLE: 7–10 YRS",
+    },
+  ];
 
   const t = copy[lang];
   const activeCropList = t.crops;
@@ -221,7 +269,7 @@ function Home() {
     const data = new FormData(event.currentTarget);
     const subject = quoteProduct ? `TERA-WET Inquiry — ${quoteProduct}` : "TERA-WET Official Inquiry";
     const body = `Name: ${data.get("name")}\nEmail: ${data.get("email")}\nLanguage: ${lang}\n\nProject Details:\n${data.get("message")}`;
-    window.location.href = `mailto:info@terawet.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:terawet.original@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
@@ -353,18 +401,69 @@ function Home() {
 
             <div className="science-experience">
               <div className="science-image-wrap">
-                <img
-                  src={materialImage}
-                  loading="lazy"
-                  width={1536}
-                  height={1024}
-                  alt="Microstructure of Terawet superabsorbent crystal"
-                />
-                <div className="image-corner top-left">FIG. 0{stage + 1} / HYDROGEL MATRIX</div>
-                <div className="science-reticle" aria-hidden="true">
+                {stageMedia.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className={`science-slide ${idx === stage ? "active" : ""}`}
+                    aria-hidden={idx !== stage}
+                  >
+                    {idx === 1 && showVideo ? (
+                      <video
+                        src={item.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="science-slide-media"
+                      />
+                    ) : (
+                      <img
+                        src={item.image}
+                        loading={idx === 0 ? "eager" : "lazy"}
+                        width={1536}
+                        height={1024}
+                        alt={item.alt}
+                        className="science-slide-media"
+                      />
+                    )}
+                  </div>
+                ))}
+
+                {/* HUD Corner Indicators */}
+                <div className="image-corner top-left">
+                  {stageMedia[stage].fig}
+                </div>
+
+                <div className="science-telemetry-badge">
+                  <span className="science-telemetry-dot" />
+                  <span>{stageMedia[stage].metricTag}</span>
+                  {stageMedia[stage].video && (
+                    <button
+                      type="button"
+                      className="science-video-toggle"
+                      onClick={() => setShowVideo(!showVideo)}
+                      aria-label="Toggle video / photo"
+                    >
+                      {showVideo ? `📷 ${t.photoView}` : `▶ ${t.videoView}`}
+                    </button>
+                  )}
+                </div>
+
+                <div
+                  className="science-reticle"
+                  style={{
+                    top: stageMedia[stage].reticle.top,
+                    left: stageMedia[stage].reticle.left,
+                    transition: "top 0.7s cubic-bezier(0.16, 1, 0.3, 1), left 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                  aria-hidden="true"
+                >
                   <span>+</span>
                 </div>
-                <div className="image-corner bottom-right">MICROSTRUCTURE / TERA-WET BIO</div>
+
+                <div className="image-corner bottom-right">
+                  {stageMedia[stage].tag}
+                </div>
               </div>
 
               <div className="science-panel">
@@ -392,7 +491,10 @@ function Home() {
                         className={index === stage ? "selected" : ""}
                         aria-label={`Stage ${index + 1}: ${item.title}`}
                         aria-pressed={index === stage}
-                        onClick={() => setStage(index)}
+                        onClick={() => {
+                          setStage(index);
+                          setShowVideo(false);
+                        }}
                       />
                     ))}
                   </div>
@@ -402,7 +504,10 @@ function Home() {
                       variant="outline"
                       size="icon"
                       aria-label="Previous stage"
-                      onClick={() => setStage((stage + 3) % 4)}
+                      onClick={() => {
+                        setStage((stage + 3) % 4);
+                        setShowVideo(false);
+                      }}
                     >
                       <ArrowLeft />
                     </Button>
@@ -410,7 +515,10 @@ function Home() {
                       variant="outline"
                       size="icon"
                       aria-label="Next stage"
-                      onClick={() => setStage((stage + 1) % 4)}
+                      onClick={() => {
+                        setStage((stage + 1) % 4);
+                        setShowVideo(false);
+                      }}
                     >
                       <ArrowRight />
                     </Button>
@@ -658,15 +766,15 @@ function Home() {
               <h2 className="display-title">{t.contactTitle}</h2>
               <p>{t.contactIntro}</p>
 
-              <a className="contact-email" href="mailto:info@terawet.com">
-                info@terawet.com <ArrowUpRight size={24} />
+              <a className="contact-email" href="mailto:terawet.original@gmail.com">
+                terawet.original@gmail.com <ArrowUpRight size={24} />
               </a>
 
               <div className="contact-social">
                 <a href="https://wa.me/16195160130" target="_blank" rel="noreferrer">
                   WHATSAPP <ArrowUpRight size={15} />
                 </a>
-                <a href="mailto:info@terawet.com">
+                <a href="mailto:terawet.original@gmail.com">
                   EMAIL <ArrowUpRight size={15} />
                 </a>
                 <a href="https://www.youtube.com/channel/UCcZDTmKXF6Jl8sfHLbLUFBw" target="_blank" rel="noreferrer">
@@ -709,46 +817,21 @@ function Home() {
         </div>
       </footer>
 
-      {/* Floating ElevenLabs Conversational AI Trigger */}
+      {/* Floating ElevenLabs Woven Glass Voice Agent Trigger */}
       <div className="voice-widget">
-        <Button
-          className="voice-trigger shadow-2xl"
-          aria-label={t.voice}
-          aria-expanded={voiceOpen}
-          onClick={() => {
-            triggerElevenLabsCall();
-            setVoiceOpen(!voiceOpen);
-          }}
-        >
-          <span className="voice-pulse" />
-          <Mic className="h-5 w-5 text-white" />
-        </Button>
-
-        {voiceOpen && (
-          <div className="voice-popover">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t.close}
-              onClick={() => setVoiceOpen(false)}
-            >
-              <X />
-            </Button>
-            <span className="eyebrow small">TERA-WET / VOICE AI</span>
-            <h3 className="text-lg font-bold text-white mt-1">{t.voice}</h3>
-            <p className="text-xs text-muted-foreground my-2">{t.voiceDesc}</p>
-            <Button
-              className="button-bright w-full"
-              onClick={() => {
-                triggerElevenLabsCall();
-                setVoiceOpen(false);
-              }}
-            >
-              {t.voiceCallAction}
-              <ArrowUpRight />
-            </Button>
-          </div>
-        )}
+        <div className="voice-widget-pill" onClick={() => triggerElevenLabsCall()}>
+          <span className="voice-widget-pill-dot" />
+          <span>{t.voice}</span>
+        </div>
+        <div className="voice-glass-wrapper">
+          <WovenGlassButton
+            className="voice-woven-btn"
+            label="AI VOICE"
+            onActivate={() => {
+              triggerElevenLabsCall();
+            }}
+          />
+        </div>
       </div>
 
       {/* Quote Inquiry Modal */}
