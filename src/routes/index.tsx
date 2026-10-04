@@ -63,8 +63,10 @@ const copy = {
     contactIntro: "Розкажіть про ваше господарство або ділянку. Наші спеціалісти підберуть оптимальну фракцію та схему застосування.",
     name: "Ваше ім’я",
     email: "Електронна пошта",
+    phone: "Номер телефону",
     message: "Культура, площа, регіон та ваші завдання...",
     send: "Надіслати запит",
+    gdprConsent: "Я погоджуюся на обробку персональних даних для обробки запиту",
     voice: "ШІ-Агроном TERA-WET (Голос)",
     voiceDesc: "Натисніть для прямої голосової консультації з нашим інтелектуальним асистентом.",
     voiceCallAction: "Почати голосову розмову",
@@ -119,8 +121,10 @@ const copy = {
     contactIntro: "Tell us about your agricultural project. We'll help you select the exact grade, dosage, and deployment method.",
     name: "Your name",
     email: "Email address",
+    phone: "Phone number",
     message: "Crop, acreage, region, and target goals...",
     send: "Send Inquiry",
+    gdprConsent: "I agree to the processing of personal data for inquiry and order processing",
     voice: "AI Agronomist TERA-WET (Voice)",
     voiceDesc: "Tap to initiate real-time conversational voice consultation with our AI agronomist.",
     voiceCallAction: "Start Voice Consultation",
@@ -175,8 +179,10 @@ const copy = {
     contactIntro: "Разкажете ни за вашето стопанство. Нашите специалисти ще ви помогнат да изберете правилния продукт и схема на приложение.",
     name: "Вашето име",
     email: "Имейл адрес",
+    phone: "Телефонен номер",
     message: "Култура, площ, регион и вашите цели...",
     send: "Изпратете запитване",
+    gdprConsent: "Съгласен съм с обработката на личните ми данни за целите на запитването",
     voice: "ШИ Агроном TERA-WET (Глас)",
     voiceDesc: "Натиснете за директна гласова консултация в реално време с нашия изкуствен интелект.",
     voiceCallAction: "Започнете гласов разговор",
@@ -284,8 +290,10 @@ function Home() {
   const sendInquiry = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const phone = data.get("phone") || "-";
+    const gdpr = data.get("gdpr") ? "Так / Прийнято (Confirmed)" : "Ні";
     const subject = quoteProduct ? `TERA-WET Inquiry — ${quoteProduct}` : "TERA-WET Official Inquiry";
-    const body = `Name: ${data.get("name")}\nEmail: ${data.get("email")}\nLanguage: ${lang}\n\nProject Details:\n${data.get("message")}`;
+    const body = `Name: ${data.get("name")}\nPhone: ${phone}\nEmail: ${data.get("email")}\nGDPR Consent: ${gdpr}\nLanguage: ${lang}\n\nProject Details:\n${data.get("message")}`;
     window.location.href = `mailto:terawet.original@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -820,8 +828,18 @@ function Home() {
                 <label htmlFor="contact-email">02 / {t.email}</label>
                 <input id="contact-email" name="email" type="email" placeholder="example@agri-corp.com" required />
 
-                <label htmlFor="contact-message">03 / {t.message}</label>
+                <label htmlFor="contact-phone">03 / {t.phone}</label>
+                <input id="contact-phone" name="phone" type="tel" placeholder="+380... / +359... / +1..." required />
+
+                <label htmlFor="contact-message">04 / {t.message}</label>
                 <textarea id="contact-message" name="message" placeholder={t.message} rows={3} required minLength={8} />
+
+                <div className="gdpr-checkbox-container">
+                  <label className="gdpr-checkbox-label">
+                    <input type="checkbox" name="gdpr" required />
+                    <span>{t.gdprConsent}</span>
+                  </label>
+                </div>
 
                 <Button type="submit" className="button-bright form-submit">
                   {t.send}
@@ -926,6 +944,9 @@ function Home() {
               <label htmlFor="quote-email">{t.email}</label>
               <input id="quote-email" name="email" type="email" required placeholder="you@company.com" />
 
+              <label htmlFor="quote-phone">{t.phone}</label>
+              <input id="quote-phone" name="phone" type="tel" required placeholder="+380... / +359... / +1..." />
+
               <label htmlFor="quote-message">{t.message}</label>
               <textarea
                 id="quote-message"
@@ -935,6 +956,13 @@ function Home() {
                 rows={3}
                 placeholder="Volume needed (kg), crop type, shipping destination..."
               />
+
+              <div className="gdpr-checkbox-container">
+                <label className="gdpr-checkbox-label">
+                  <input type="checkbox" name="gdpr" required />
+                  <span>{t.gdprConsent}</span>
+                </label>
+              </div>
 
               <Button type="submit" className="button-bright">
                 {t.send}
