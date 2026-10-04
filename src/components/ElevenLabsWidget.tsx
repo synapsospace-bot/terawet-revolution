@@ -12,7 +12,14 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       widget = document.createElement("elevenlabs-convai");
       widget.setAttribute("agent-id", agentId);
       widget.setAttribute("data-theme", "dark");
+      widget.setAttribute("placement", "bottom-left");
+      widget.setAttribute("data-placement", "bottom-left");
+      widget.setAttribute("data-open", "false");
+      widget.style.setProperty("display", "none", "important");
       document.body.appendChild(widget);
+    } else {
+      widget.setAttribute("placement", "bottom-left");
+      widget.setAttribute("data-placement", "bottom-left");
     }
 
     // 2. Load ElevenLabs ConvAI script
@@ -28,7 +35,17 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
     // circular launcher buttons, and 'Powered by ElevenAgents' banners.
     const hideIdleWidgets = () => {
       const el = document.querySelector("elevenlabs-convai") as HTMLElement | null;
-      if (!el || !el.shadowRoot) return;
+      if (!el) return;
+
+      const isOpen = el.getAttribute("data-open") === "true";
+      if (!isOpen) {
+        el.style.setProperty("display", "none", "important");
+        el.style.setProperty("visibility", "hidden", "important");
+        el.style.setProperty("pointer-events", "none", "important");
+        el.style.setProperty("opacity", "0", "important");
+      }
+
+      if (!el.shadowRoot) return;
 
       // Inject robust shadow DOM stylesheet
       if (!el.shadowRoot.querySelector("#clean-assistant-style")) {
@@ -57,27 +74,18 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             left: -9999px !important;
           }
 
-          /* Ensure the expanded call sheet is visible and positioned when triggered */
-          .sheet {
-            display: flex !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-            z-index: 10000 !important;
-          }
-
           /* Prominent Close Button inside the active sheet */
           #custom-agent-close-btn {
             position: absolute !important;
             top: 14px !important;
             right: 14px !important;
-            z-index: 99999 !important;
+            z-index: 2147483647 !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             gap: 6px !important;
-            background: rgba(6, 22, 16, 0.92) !important;
-            border: 1px solid rgba(16, 185, 129, 0.6) !important;
+            background: rgba(6, 22, 16, 0.95) !important;
+            border: 1px solid rgba(16, 185, 129, 0.7) !important;
             color: #10b981 !important;
             font-family: inherit !important;
             font-size: 11px !important;
@@ -90,10 +98,11 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             backdrop-filter: blur(12px) !important;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
             transition: all 0.2s ease !important;
+            pointer-events: auto !important;
           }
           #custom-agent-close-btn:hover {
-            background: rgba(239, 68, 68, 0.3) !important;
-            border-color: rgba(239, 68, 68, 0.8) !important;
+            background: rgba(239, 68, 68, 0.35) !important;
+            border-color: rgba(239, 68, 68, 0.9) !important;
             color: #ef4444 !important;
             transform: scale(1.05) !important;
           }
@@ -101,7 +110,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         el.shadowRoot.appendChild(style);
       }
 
-      // Inject close button into .sheet if active
+      // Inject close button into .sheet or active card if active
       const sheet = el.shadowRoot.querySelector(".sheet") as HTMLElement | null;
       if (sheet && !sheet.querySelector("#custom-agent-close-btn")) {
         const closeBtn = document.createElement("button");
@@ -109,15 +118,49 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         closeBtn.setAttribute("type", "button");
         closeBtn.setAttribute("aria-label", "Закрити AI-Агента");
         closeBtn.innerHTML = `✕ ЗАКРИТИ`;
-        closeBtn.onclick = (e) => {
+        
+        const handleBtnClose = (e: Event) => {
           e.preventDefault();
           e.stopPropagation();
           closeElevenLabsCall();
         };
+        closeBtn.onclick = handleBtnClose;
+        closeBtn.addEventListener("click", handleBtnClose);
+        closeBtn.addEventListener("pointerdown", handleBtnClose);
         sheet.appendChild(closeBtn);
       }
 
-      // Direct element hiding fallback for any dynamically rendered nodes
+      // Attach capture-phase listener to shadowRoot for any close/end button
+      const rootAny = el.shadowRoot as unknown as { _listenersAttached?: boolean };
+      if (!rootAny._listenersAttached) {
+        rootAny._listenersAttached = true;
+        const interceptClose = (e: Event) => {
+          const target = e.target as HTMLElement | null;
+          if (!target) return;
+          const btn = target.closest("button");
+          if (btn) {
+            const id = btn.id || "";
+            const label = (btn.getAttribute("aria-label") || "").toLowerCase();
+            const text = (btn.textContent || "").toLowerCase();
+            if (
+              id === "custom-agent-close-btn" ||
+              label.includes("close") ||
+              label.includes("закрити") ||
+              label.includes("dismiss") ||
+              label.includes("end") ||
+              text.includes("закрити")
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              closeElevenLabsCall();
+            }
+          }
+        };
+        el.shadowRoot.addEventListener("click", interceptClose, true);
+        el.shadowRoot.addEventListener("pointerdown", interceptClose, true);
+      }
+
+      // Direct element hiding fallback for any dynamically rendered idle nodes
       const elementsToHide = el.shadowRoot.querySelectorAll(
         '[class*="rounded-sheet"], [class*="rounded-compact-sheet"], [class*="rounded-bubble"], button.rounded-full, p[class*="whitespace-nowrap"]'
       );
@@ -149,8 +192,19 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       attachObserver();
     }, 150);
 
+    const handleDocumentClick = (e: MouseEvent) => {
+      const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
+      if (!widget || widget.getAttribute("data-open") !== "true") return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest(".voice-widget") || target.closest("elevenlabs-convai")) return;
+      closeElevenLabsCall();
+    };
+    document.addEventListener("click", handleDocumentClick);
+
     return () => {
       clearInterval(interval);
+      document.removeEventListener("click", handleDocumentClick);
       if (observer) observer.disconnect();
     };
   }, [agentId]);
@@ -162,6 +216,16 @@ export function triggerElevenLabsCall() {
   const attempt = (retries = 8) => {
     const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
     if (widget) {
+      widget.setAttribute("data-open", "true");
+      widget.style.removeProperty("display");
+      widget.style.removeProperty("visibility");
+      widget.style.removeProperty("pointer-events");
+      widget.style.removeProperty("opacity");
+      widget.style.setProperty("display", "block", "important");
+      widget.style.setProperty("visibility", "visible", "important");
+      widget.style.setProperty("pointer-events", "auto", "important");
+      widget.style.setProperty("opacity", "1", "important");
+
       document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "expand" } }));
       widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "expand" } }));
       widget.dispatchEvent(new CustomEvent("elevenlabs-convai:call", { bubbles: true, composed: true }));
@@ -170,7 +234,7 @@ export function triggerElevenLabsCall() {
         const buttons = widget.shadowRoot.querySelectorAll("button");
         buttons.forEach((btn) => {
           const label = btn.getAttribute("aria-label") || "";
-          if (!label.includes("Dismiss") && !label.includes("Close") && !label.includes("Закрити")) {
+          if (!label.includes("Dismiss") && !label.includes("Close") && !label.includes("Закрити") && btn.id !== "custom-agent-close-btn") {
             btn.click();
           }
         });
@@ -184,15 +248,24 @@ export function triggerElevenLabsCall() {
 }
 
 export function closeElevenLabsCall() {
-  document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
   const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
   if (widget) {
+    widget.setAttribute("data-open", "false");
+    widget.style.setProperty("display", "none", "important");
+    widget.style.setProperty("visibility", "hidden", "important");
+    widget.style.setProperty("pointer-events", "none", "important");
+    widget.style.setProperty("opacity", "0", "important");
+
+    document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
     widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
     if (widget.shadowRoot) {
-      const endButtons = widget.shadowRoot.querySelectorAll(
-        'button[aria-label*="end" i], button[aria-label*="End" i], button[aria-label*="Close" i], button[aria-label*="Dismiss" i]'
-      );
-      endButtons.forEach((btn) => (btn as HTMLElement).click());
+      const endButtons = widget.shadowRoot.querySelectorAll("button");
+      endButtons.forEach((btn) => {
+        const label = (btn.getAttribute("aria-label") || "").toLowerCase();
+        if (label.includes("end") || label.includes("close") || label.includes("dismiss")) {
+          btn.click();
+        }
+      });
     }
   }
   window.dispatchEvent(new CustomEvent("terawet:agent-closed"));
