@@ -6,7 +6,7 @@ interface ElevenLabsWidgetProps {
 
 export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w" }: ElevenLabsWidgetProps) {
   useEffect(() => {
-    // 1. Inject ElevenLabs ConvAI custom element if not present
+    // 1. Inject or update ElevenLabs ConvAI custom element
     let widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
     if (!widget) {
       widget = document.createElement("elevenlabs-convai");
@@ -14,16 +14,22 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       widget.setAttribute("data-theme", "dark");
       widget.setAttribute("placement", "bottom-left");
       widget.setAttribute("data-placement", "bottom-left");
+      widget.setAttribute("always-expanded", "true");
       widget.setAttribute("data-open", "false");
       widget.style.setProperty("display", "none", "important");
       widget.style.setProperty("visibility", "hidden", "important");
+      widget.style.setProperty("pointer-events", "none", "important");
+      widget.style.setProperty("opacity", "0", "important");
       document.body.appendChild(widget);
     } else {
+      widget.setAttribute("agent-id", agentId);
+      widget.setAttribute("data-theme", "dark");
       widget.setAttribute("placement", "bottom-left");
       widget.setAttribute("data-placement", "bottom-left");
+      widget.setAttribute("always-expanded", "true");
     }
 
-    // 2. Load ElevenLabs ConvAI script
+    // 2. Load ElevenLabs ConvAI script if not already present
     if (!document.querySelector('script[src*="convai-widget-embed"]')) {
       const script = document.createElement("script");
       script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
@@ -46,7 +52,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       } else {
         el.style.setProperty("display", "block", "important");
         el.style.setProperty("visibility", "visible", "important");
-        el.style.setProperty("pointer-events", "auto", "important");
+        el.style.setProperty("pointer-events", "none", "important"); // Host covers screen with pointer-events: none
         el.style.setProperty("opacity", "1", "important");
       }
 
@@ -58,7 +64,6 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
         style.id = "clean-assistant-style";
         style.textContent = `
           /* Hide idle popup cards, bubbles, and credit footers */
-          [class*="rounded-sheet"],
           [class*="rounded-compact-sheet"],
           [class*="rounded-bubble"],
           p[class*="whitespace-nowrap"],
@@ -74,33 +79,38 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             overflow: hidden !important;
           }
 
-          /* Keep launcher button in DOM for programmatic clicks without visual presence */
+          /* Hide default floating trigger button since custom WovenGlassButton is used */
           button.rounded-full,
           button[aria-label="Open chat"] {
+            display: none !important;
             opacity: 0 !important;
             pointer-events: none !important;
-            width: 1px !important;
-            height: 1px !important;
+            width: 0 !important;
+            height: 0 !important;
             position: absolute !important;
-            bottom: 0 !important;
-            left: 0 !important;
           }
 
-          /* Active sheet styling anchored above the bottom-left trigger button */
-          :host([data-open="true"]) .sheet {
-            display: flex !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+          /* Active sheet styling anchored cleanly in bottom-left above the trigger button */
+          .sheet {
             pointer-events: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
             position: fixed !important;
-            left: 20px !important;
+            left: 24px !important;
             bottom: 84px !important;
             right: auto !important;
-            z-index: 10000 !important;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.25) !important;
+            width: 380px !important;
+            max-width: calc(100vw - 32px) !important;
+            height: min(520px, calc(100vh - 110px)) !important;
+            max-height: calc(100vh - 110px) !important;
+            z-index: 10001 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.3) !important;
+            border: 1px solid rgba(16, 185, 129, 0.4) !important;
+            background: #061610 !important;
+            overflow: hidden !important;
           }
 
-          /* Hide sheet when agent is not open */
           :host([data-open="false"]) .sheet,
           :host(:not([data-open="true"])) .sheet {
             display: none !important;
@@ -109,12 +119,15 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             pointer-events: none !important;
           }
 
-          @media (max-width: 600px) {
-            :host([data-open="true"]) .sheet {
+          @media (max-width: 500px) {
+            .sheet {
               left: 10px !important;
               bottom: 74px !important;
-              right: auto !important;
+              width: calc(100vw - 20px) !important;
               max-width: calc(100vw - 20px) !important;
+              height: min(480px, calc(100vh - 90px)) !important;
+              max-height: calc(100vh - 90px) !important;
+              border-radius: 20px !important;
             }
           }
 
@@ -190,8 +203,16 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       attachObserver();
     }, 150);
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeElevenLabsCall();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
     return () => {
       clearInterval(interval);
+      window.removeEventListener("keydown", onKeyDown);
       if (observer) observer.disconnect();
     };
   }, [agentId]);
@@ -200,7 +221,7 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
 }
 
 export function triggerElevenLabsCall() {
-  const attempt = (retries = 10) => {
+  const attempt = (retries = 15) => {
     const widget = document.querySelector("elevenlabs-convai") as HTMLElement | null;
     if (widget) {
       widget.setAttribute("data-open", "true");
@@ -210,25 +231,12 @@ export function triggerElevenLabsCall() {
       widget.style.removeProperty("opacity");
       widget.style.setProperty("display", "block", "important");
       widget.style.setProperty("visibility", "visible", "important");
-      widget.style.setProperty("pointer-events", "auto", "important");
+      widget.style.setProperty("pointer-events", "none", "important"); // Host covers viewport with pointer-events: none, sheet has pointer-events: auto
       widget.style.setProperty("opacity", "1", "important");
 
-      document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "expand" } }));
-      widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "expand" } }));
-      widget.dispatchEvent(new CustomEvent("elevenlabs-convai:call", { bubbles: true, composed: true }));
-
-      if (widget.shadowRoot) {
-        const buttons = widget.shadowRoot.querySelectorAll("button");
-        buttons.forEach((btn) => {
-          const label = (btn.getAttribute("aria-label") || "").toLowerCase();
-          if (!label.includes("dismiss") && !label.includes("close") && !label.includes("закрити") && btn.id !== "custom-agent-close-btn") {
-            btn.click();
-          }
-        });
-      }
       window.dispatchEvent(new CustomEvent("terawet:agent-opened"));
     } else if (retries > 0) {
-      setTimeout(() => attempt(retries - 1), 200);
+      setTimeout(() => attempt(retries - 1), 150);
     }
   };
   attempt();
@@ -243,13 +251,11 @@ export function closeElevenLabsCall() {
     widget.style.setProperty("pointer-events", "none", "important");
     widget.style.setProperty("opacity", "0", "important");
 
-    document.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
-    widget.dispatchEvent(new CustomEvent("elevenlabs-agent:expand", { detail: { action: "collapse" } }));
     if (widget.shadowRoot) {
       const endButtons = widget.shadowRoot.querySelectorAll("button");
       endButtons.forEach((btn) => {
         const label = (btn.getAttribute("aria-label") || "").toLowerCase();
-        if (label.includes("end") || label.includes("close") || label.includes("dismiss")) {
+        if (label.includes("end") || label.includes("close") || label.includes("dismiss") || label.includes("згорнути")) {
           btn.click();
         }
       });
