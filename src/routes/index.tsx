@@ -26,7 +26,7 @@ const copy = {
 };
 
 const stages = [
-  { number: "01", title: "ABSORPTION MATRIX", body: "Dry crystals take up water and swell, forming a hydrated matrix around the root zone.", metric: "UP TO 400×", sub: "WATER RETENTION CAPACITY" },
+  { number: "01", title: "ABSORPTION MATRIX", body: "Dry crystals take up water and swell, forming a hydrated matrix around the root zone. Hydration can occur in approximately 15 minutes under suitable conditions.", metric: "UP TO 400×", sub: "WATER RETENTION CAPACITY" },
   { number: "02", title: "MOISTURE RESERVOIR", body: "Water stays in the soil profile instead of draining straight through or disappearing from the surface.", metric: "IN THE ROOT ZONE", sub: "WHERE WATER IS NEEDED" },
   { number: "03", title: "ROOT EXCHANGE", body: "The hydrated matrix releases moisture as the surrounding soil dries, making water accessible to roots.", metric: "ON DEMAND", sub: "ROOT ACCESS TO MOISTURE" },
   { number: "04", title: "LONG-TERM CYCLE", body: "Repeated wetting and drying cycles support a multi-year soil water-management strategy.", metric: "7–10 YEARS", sub: "STATED PRODUCT LIFESPAN" },
@@ -99,7 +99,7 @@ function Home() {
               <div className="science-image-wrap"><img src={materialImage} loading="lazy" width={1536} height={1024} alt="Dry hydrogel granules beside a hydrated crystal" /><div className="image-corner top-left">FIG. 0{stage + 1} / HYDROGEL MATRIX</div><div className="science-reticle" aria-hidden="true"><span>+</span></div><div className="image-corner bottom-right">MICROSTRUCTURE / TERA-WET</div></div>
               <div className="science-panel"><div className="science-panel-top"><span>THE HYDRATION CYCLE</span><span>{activeStage.number} / 04</span></div><div className="stage-copy"><span className="stage-count">{activeStage.number}</span><h3>{activeStage.title}</h3><p>{activeStage.body}</p><div className="stage-metric"><strong>{activeStage.metric}</strong><span>{activeStage.sub}</span></div></div><div className="stage-controls"><div className="stage-progress">{stages.map((item, index) => <Button key={item.number} variant="ghost" className={index === stage ? "selected" : ""} aria-label={`Stage ${index + 1}: ${item.title}`} aria-pressed={index === stage} onClick={() => setStage(index)} />)}</div><div className="stage-arrows"><Button variant="outline" size="icon" aria-label="Previous stage" onClick={() => setStage((stage + 3) % 4)}><ArrowLeft /></Button><Button variant="outline" size="icon" aria-label="Next stage" onClick={() => setStage((stage + 1) % 4)}><ArrowRight /></Button></div></div></div>
             </div>
-            <div className="stats-strip"><div><strong>400<span>×</span></strong><span>WATER ABSORPTION<br />CAPACITY*</span></div><div><strong>50<span>%</span></strong><span>POTENTIAL IRRIGATION<br />REDUCTION*</span></div><div><strong>7–10<span>YR</span></strong><span>STATED APPLICATION<br />LIFESPAN*</span></div></div>
+            <div className="stats-strip"><div><strong>50<span>%</span></strong><span>POTENTIAL IRRIGATION<br />REDUCTION*</span></div><div><strong>25–40<span>%</span></strong><span>CLAIMED YIELD<br />INCREASE*</span></div><div><strong>98<span>%</span></strong><span>CLAIMED PLANT<br />SURVIVAL RATE*</span></div></div>
             <p className="fine-print">*Indicative product claims supplied for this concept. Performance varies by soil, crop, climate, and application; request technical documentation before use.</p>
           </div>
         </section>
