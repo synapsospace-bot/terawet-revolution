@@ -76,9 +76,9 @@ export function HydrogelScene() {
         geometry.dispose();
         shell.material.dispose();
         wire.geometry.dispose();
-        (wire.material as THREE.LineBasicMaterial).dispose();
+        wire.material.dispose();
         particleGeometry.dispose();
-        (particles.material as THREE.PointsMaterial).dispose();
+        particles.material.dispose();
         renderer.dispose();
         renderer.domElement.remove();
       };
