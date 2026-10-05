@@ -67,7 +67,8 @@ const copy = {
     phone: "Номер телефону",
     city: "Місто доставки",
     cityPlaceholder: "Вкажіть ваше місто (наприклад, Київ, Одеса...)",
-    message: "Культура, площа, регіон та ваші завдання...",
+    message: "Кількість та культура",
+    messagePlaceholder: "Вкажіть кількість (кг або площа) та культуру...",
     send: "Надіслати запит",
     sending: "Надсилання...",
     sentSuccess: "Заявку успішно прийнято! Дані збережено в CRM, наш агроном зв’яжеться з вами.",
@@ -130,7 +131,8 @@ const copy = {
     phone: "Phone number",
     city: "Delivery City",
     cityPlaceholder: "Enter destination city...",
-    message: "Crop, acreage, region, and target goals...",
+    message: "Quantity and Crop",
+    messagePlaceholder: "Quantity (kg or acreage) and crop type...",
     send: "Send Inquiry",
     sending: "Sending...",
     sentSuccess: "Inquiry successfully submitted! Saved to CRM, our agronomist will contact you.",
@@ -193,7 +195,8 @@ const copy = {
     phone: "Телефонен номер",
     city: "Град за доставка",
     cityPlaceholder: "Въведете град (напр. София, Пловдив...)",
-    message: "Култура, площ, регион и вашите цели...",
+    message: "Количество и култура",
+    messagePlaceholder: "Количество (кг или площ) и култура...",
     send: "Изпратете запитване",
     sending: "Изпращане...",
     sentSuccess: "Запитването е прието успешно! Данните са записани в CRM, наш агроном ще се свърже с вас.",
@@ -333,7 +336,7 @@ function Home() {
           customer_email: email,
           customer_location: city,
           city: city,
-          request_topic: `Запит на розрахунок / Консультація: ${message}`,
+          request_topic: `Кількість та культура: ${message}`,
           language: lang,
           gdpr: "confirmed"
         }),
@@ -935,7 +938,7 @@ function Home() {
                 <input id="contact-city" name="city" placeholder={t.cityPlaceholder} required minLength={2} />
 
                 <label htmlFor="contact-message">05 / {t.message}</label>
-                <textarea id="contact-message" name="message" placeholder={t.message} rows={3} required minLength={8} />
+                <textarea id="contact-message" name="message" placeholder={t.messagePlaceholder} rows={3} required minLength={2} />
 
                 <div className="gdpr-checkbox-container">
                   <label className="gdpr-checkbox-label">
@@ -1063,9 +1066,9 @@ function Home() {
                 id="quote-message"
                 name="message"
                 required
-                minLength={8}
+                minLength={2}
                 rows={3}
-                placeholder="Volume needed (kg), crop type, shipping destination..."
+                placeholder={t.messagePlaceholder}
               />
 
               <div className="gdpr-checkbox-container">
