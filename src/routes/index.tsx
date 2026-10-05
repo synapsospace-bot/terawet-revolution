@@ -65,8 +65,13 @@ const copy = {
     name: "Ваше ім’я",
     email: "Електронна пошта",
     phone: "Номер телефону",
+    city: "Місто доставки",
+    cityPlaceholder: "Вкажіть ваше місто (наприклад, Київ, Одеса...)",
     message: "Культура, площа, регіон та ваші завдання...",
     send: "Надіслати запит",
+    sending: "Надсилання...",
+    sentSuccess: "Заявку успішно прийнято! Дані збережено в CRM, наш агроном зв’яжеться з вами.",
+    sentError: "Помилка зв’язку. Спробуйте ще раз або напишіть нам у Telegram.",
     gdprConsent: "Я погоджуюся на обробку персональних даних для обробки запиту",
     voice: "ШІ-Агроном TERA-WET (Голос)",
     voiceDesc: "Натисніть для прямої голосової консультації з нашим інтелектуальним асистентом.",
@@ -123,8 +128,13 @@ const copy = {
     name: "Your name",
     email: "Email address",
     phone: "Phone number",
+    city: "Delivery City",
+    cityPlaceholder: "Enter destination city...",
     message: "Crop, acreage, region, and target goals...",
     send: "Send Inquiry",
+    sending: "Sending...",
+    sentSuccess: "Inquiry successfully submitted! Saved to CRM, our agronomist will contact you.",
+    sentError: "Submission error. Please try again or reach out on Telegram.",
     gdprConsent: "I agree to the processing of personal data for inquiry and order processing",
     voice: "AI Agronomist TERA-WET (Voice)",
     voiceDesc: "Tap to initiate real-time conversational voice consultation with our AI agronomist.",
@@ -181,8 +191,13 @@ const copy = {
     name: "Вашето име",
     email: "Имейл адрес",
     phone: "Телефонен номер",
+    city: "Град за доставка",
+    cityPlaceholder: "Въведете град (напр. София, Пловдив...)",
     message: "Култура, площ, регион и вашите цели...",
     send: "Изпратете запитване",
+    sending: "Изпращане...",
+    sentSuccess: "Запитването е прието успешно! Данните са записани в CRM, наш агроном ще се свърже с вас.",
+    sentError: "Грешка при изпращане. Моля, опитайте отново или пишете в Telegram.",
     gdprConsent: "Съгласен съм с обработката на личните ми данни за целите на запитването",
     voice: "ШИ Агроном TERA-WET (Глас)",
     voiceDesc: "Натиснете за директна гласова консултация в реално време с нашия изкуствен интелект.",
@@ -288,14 +303,101 @@ function Home() {
     [t.contact, "#contact"]
   ];
 
-  const sendInquiry = (event: FormEvent<HTMLFormElement>) => {
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(false);
+  const [modalSubmitting, setModalSubmitting] = useState(false);
+  const [modalSuccess, setModalSuccess] = useState(false);
+
+  const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/1hx4kbz4a0d4788aggfnvuleuem8gzbb";
+
+  const sendInquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const phone = data.get("phone") || "-";
-    const gdpr = data.get("gdpr") ? "Так / Прийнято (Confirmed)" : "Ні";
-    const subject = quoteProduct ? `TERA-WET Inquiry — ${quoteProduct}` : "TERA-WET Official Inquiry";
-    const body = `Name: ${data.get("name")}\nPhone: ${phone}\nEmail: ${data.get("email")}\nGDPR Consent: ${gdpr}\nLanguage: ${lang}\n\nProject Details:\n${data.get("message")}`;
-    window.location.href = `mailto:terawet.original@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
+    const city = String(data.get("city") || "").trim();
+    const message = String(data.get("message") || "").trim();
+
+    setFormSubmitting(true);
+    setFormSuccess(false);
+
+    try {
+      const response = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: name,
+          customer_phone: phone,
+          customer_email: email,
+          customer_location: city,
+          city: city,
+          request_topic: `Запит на розрахунок / Консультація: ${message}`,
+          language: lang,
+          gdpr: "confirmed"
+        }),
+      });
+
+      if (response.ok) {
+        setFormSuccess(true);
+        form.reset();
+      } else {
+        alert(t.sentError);
+      }
+    } catch (err) {
+      console.error("Webhook submission error:", err);
+      alert(t.sentError);
+    } finally {
+      setFormSubmitting(false);
+    }
+  };
+
+  const sendQuoteInquiry = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
+    const city = String(data.get("city") || "").trim();
+    const message = String(data.get("message") || "").trim();
+
+    setModalSubmitting(true);
+    setModalSuccess(false);
+
+    try {
+      const response = await fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: name,
+          customer_phone: phone,
+          customer_email: email,
+          customer_location: city,
+          city: city,
+          request_topic: `Замовлення ${quoteProduct || "TERA-WET"}: ${message}`,
+          language: lang,
+          gdpr: "confirmed"
+        }),
+      });
+
+      if (response.ok) {
+        setModalSuccess(true);
+        form.reset();
+        setTimeout(() => {
+          setQuoteProduct(null);
+          setModalSuccess(false);
+        }, 2500);
+      } else {
+        alert(t.sentError);
+      }
+    } catch (err) {
+      console.error("Webhook quote submission error:", err);
+      alert(t.sentError);
+    } finally {
+      setModalSubmitting(false);
+    }
   };
 
   return (
@@ -829,7 +931,10 @@ function Home() {
                 <label htmlFor="contact-phone">03 / {t.phone}</label>
                 <input id="contact-phone" name="phone" type="tel" placeholder="+380... / +359... / +1..." required />
 
-                <label htmlFor="contact-message">04 / {t.message}</label>
+                <label htmlFor="contact-city">04 / {t.city}</label>
+                <input id="contact-city" name="city" placeholder={t.cityPlaceholder} required minLength={2} />
+
+                <label htmlFor="contact-message">05 / {t.message}</label>
                 <textarea id="contact-message" name="message" placeholder={t.message} rows={3} required minLength={8} />
 
                 <div className="gdpr-checkbox-container">
@@ -839,8 +944,14 @@ function Home() {
                   </label>
                 </div>
 
+                {formSuccess && (
+                  <div className="form-success-banner">
+                    ✅ {t.sentSuccess}
+                  </div>
+                )}
+
                 <div className="form-submit">
-                  <AntiMetalButton type="submit" label={t.send} />
+                  <AntiMetalButton type="submit" label={formSubmitting ? t.sending : t.send} disabled={formSubmitting} />
                 </div>
               </form>
 
@@ -934,7 +1045,7 @@ function Home() {
             </h2>
             <p>{quoteProduct} · 1 kg / 5 kg / 25 kg industrial packages.</p>
 
-            <form onSubmit={sendInquiry}>
+            <form onSubmit={sendQuoteInquiry}>
               <label htmlFor="quote-name">{t.name}</label>
               <input id="quote-name" name="name" required minLength={2} placeholder={t.name} />
 
@@ -943,6 +1054,9 @@ function Home() {
 
               <label htmlFor="quote-phone">{t.phone}</label>
               <input id="quote-phone" name="phone" type="tel" required placeholder="+380... / +359... / +1..." />
+
+              <label htmlFor="quote-city">{t.city}</label>
+              <input id="quote-city" name="city" required minLength={2} placeholder={t.cityPlaceholder} />
 
               <label htmlFor="quote-message">{t.message}</label>
               <textarea
@@ -961,8 +1075,14 @@ function Home() {
                 </label>
               </div>
 
+              {modalSuccess && (
+                <div className="form-success-banner">
+                  ✅ {t.sentSuccess}
+                </div>
+              )}
+
               <div className="mt-6">
-                <AntiMetalButton type="submit" label={t.send} />
+                <AntiMetalButton type="submit" label={modalSubmitting ? t.sending : t.send} disabled={modalSubmitting} />
               </div>
             </form>
           </div>
