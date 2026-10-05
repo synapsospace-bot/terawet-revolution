@@ -13,6 +13,7 @@ import stageLifecycleImg from "@/assets/stage-lifecycle.jpg";
 import productT400Img from "@/assets/product-t400.jpg";
 import productT100Img from "@/assets/product-t100.jpg";
 import WovenGlassButton from "@/components/ui/woven-glass-button";
+import AntiMetalButton from "@/components/ui/anti-metal-button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -791,12 +792,9 @@ function Home() {
                   Потенційне зменшення витрат на іригацію до 50%. Розрахунок базується на середній ємності гідрогелю 400 л води на 1 кг препарату.
                 </p>
 
-                <Button asChild className="button-bright mt-4">
-                  <a href="#contact">
-                    {t.getInTouch}
-                    <ArrowUpRight />
-                  </a>
-                </Button>
+                <div className="mt-5">
+                  <AntiMetalButton href="#contact" label={t.getInTouch} />
+                </div>
               </div>
             </div>
           </div>
@@ -841,10 +839,9 @@ function Home() {
                   </label>
                 </div>
 
-                <Button type="submit" className="button-bright form-submit">
-                  {t.send}
-                  <ArrowUpRight />
-                </Button>
+                <div className="form-submit">
+                  <AntiMetalButton type="submit" label={t.send} />
+                </div>
               </form>
 
               <div className="contact-social contact-social-right">
@@ -964,10 +961,9 @@ function Home() {
                 </label>
               </div>
 
-              <Button type="submit" className="button-bright">
-                {t.send}
-                <ArrowUpRight />
-              </Button>
+              <div className="mt-6">
+                <AntiMetalButton type="submit" label={t.send} />
+              </div>
             </form>
           </div>
         </div>
