@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Menu, Mic, Minus, Plus, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Menu, Mic, Minus, Phone, Plus, Volume2, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HydrogelScene } from "@/components/HydrogelScene";
 import { ElevenLabsWidget, triggerElevenLabsCall, closeElevenLabsCall } from "@/components/ElevenLabsWidget";
@@ -919,6 +919,19 @@ function Home() {
               <a className="contact-email" href="mailto:terawet.original@gmail.com">
                 terawet.original@gmail.com <ArrowUpRight size={24} />
               </a>
+
+              <div className="contact-phones">
+                <a className="contact-phone-item" href="tel:+380502365858">
+                  <Phone size={20} />
+                  <span>+380 50 236 58 58</span>
+                  <span className="phone-badge">UA</span>
+                </a>
+                <a className="contact-phone-item" href="tel:+359889175452">
+                  <Phone size={20} />
+                  <span>+359 889 175 452</span>
+                  <span className="phone-badge">BG / EU</span>
+                </a>
+              </div>
             </div>
 
             <div className="contact-right">
@@ -959,6 +972,12 @@ function Home() {
               </form>
 
               <div className="contact-social contact-social-right">
+                <a href="tel:+380502365858">
+                  <Phone size={13} /> +380 50 236 58 58
+                </a>
+                <a href="tel:+359889175452">
+                  <Phone size={13} /> +359 889 175 452
+                </a>
                 <a href="https://t.me/Terawet_bot" target="_blank" rel="noreferrer">
                   TELEGRAM <ArrowUpRight size={15} />
                 </a>
