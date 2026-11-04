@@ -181,9 +181,10 @@ export function HydrogelScene({ hydrationLevel = 0.75, className = "" }: Hydroge
         const posAttr = particleGeometry.attributes["position"] as BufferAttribute;
         const arr = posAttr.array as Float32Array;
         for (let i = 0; i < count; i++) {
-          arr[i * 3] += velocities[i * 3];
-          arr[i * 3 + 1] += velocities[i * 3 + 1] + Math.sin(clock + i) * 0.0005;
-          arr[i * 3 + 2] += velocities[i * 3 + 2];
+          const j = i * 3;
+          arr[j] = (arr[j] ?? 0) + (velocities[j] ?? 0);
+          arr[j + 1] = (arr[j + 1] ?? 0) + (velocities[j + 1] ?? 0) + Math.sin(clock + i) * 0.0005;
+          arr[j + 2] = (arr[j + 2] ?? 0) + (velocities[j + 2] ?? 0);
         }
         posAttr.needsUpdate = true;
 
