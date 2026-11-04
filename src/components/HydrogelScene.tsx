@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { BufferAttribute } from "three";
 
 interface HydrogelSceneProps {
   hydrationLevel?: number; // 0 to 1
@@ -177,7 +178,7 @@ export function HydrogelScene({ hydrationLevel = 0.75, className = "" }: Hydroge
         coreMat.emissiveIntensity = 0.55 + Math.sin(clock * 2.0) * 0.3;
 
         // Particle floating drift
-        const posAttr = particleGeometry.attributes.position as THREE.BufferAttribute;
+        const posAttr = particleGeometry.attributes["position"] as BufferAttribute;
         const arr = posAttr.array as Float32Array;
         for (let i = 0; i < count; i++) {
           arr[i * 3] += velocities[i * 3];

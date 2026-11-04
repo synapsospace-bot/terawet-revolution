@@ -291,10 +291,11 @@ function Home() {
   const t = copy[lang];
   const activeCropList = t.crops;
   const activeStageList = t.stages;
+  const activeSlide = stageMedia[stage] ?? stageMedia[0]!;
 
   const hectares = (Number(area) || 0) * (unit === "ha" ? 1 : 0.0001);
-  const activeCrop = activeCropList[crop] ?? activeCropList[0];
-  const activeStage = activeStageList[stage] ?? activeStageList[0];
+  const activeCrop = activeCropList[crop] ?? activeCropList[0]!;
+  const activeStage = activeStageList[stage] ?? activeStageList[0]!;
   const kilograms = hectares * activeCrop.rate;
   const formatKg = kilograms < 10 ? kilograms.toFixed(2).replace(/\.00$/, "") : Math.round(kilograms).toLocaleString();
   const estimatedWaterSavedLiters = Math.round(kilograms * 400).toLocaleString();
@@ -566,13 +567,13 @@ function Home() {
 
                 {/* HUD Corner Indicators */}
                 <div className="image-corner top-left">
-                  {stageMedia[stage].fig}
+                  {activeSlide.fig}
                 </div>
 
                 <div className="science-telemetry-badge">
                   <span className="science-telemetry-dot" />
-                  <span>{stageMedia[stage].metricTag}</span>
-                  {stageMedia[stage].video && (
+                  <span>{activeSlide.metricTag}</span>
+                  {activeSlide.video && (
                     <button
                       type="button"
                       className="science-video-toggle"
@@ -587,8 +588,8 @@ function Home() {
                 <div
                   className="science-reticle"
                   style={{
-                    top: stageMedia[stage].reticle.top,
-                    left: stageMedia[stage].reticle.left,
+                    top: activeSlide.reticle.top,
+                    left: activeSlide.reticle.left,
                     transition: "top 0.7s cubic-bezier(0.16, 1, 0.3, 1), left 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                   aria-hidden="true"
@@ -597,7 +598,7 @@ function Home() {
                 </div>
 
                 <div className="image-corner bottom-right">
-                  {stageMedia[stage].tag}
+                  {activeSlide.tag}
                 </div>
               </div>
 
