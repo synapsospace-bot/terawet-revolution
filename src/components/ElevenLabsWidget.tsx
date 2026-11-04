@@ -12,8 +12,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
       widget = document.createElement("elevenlabs-convai");
       widget.setAttribute("agent-id", agentId);
       widget.setAttribute("data-theme", "light");
-      widget.setAttribute("placement", "bottom-left");
-      widget.setAttribute("data-placement", "bottom-left");
+      widget.setAttribute("placement", "bottom-right");
+      widget.setAttribute("data-placement", "bottom-right");
       widget.setAttribute("always-expanded", "true");
       widget.setAttribute("data-open", "false");
       widget.style.setProperty("display", "none", "important");
@@ -24,8 +24,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
     } else {
       widget.setAttribute("agent-id", agentId);
       widget.setAttribute("data-theme", "light");
-      widget.setAttribute("placement", "bottom-left");
-      widget.setAttribute("data-placement", "bottom-left");
+      widget.setAttribute("placement", "bottom-right");
+      widget.setAttribute("data-placement", "bottom-right");
       widget.setAttribute("always-expanded", "true");
     }
 
@@ -96,9 +96,9 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             display: flex !important;
             flex-direction: column !important;
             position: fixed !important;
-            left: 24px !important;
+            right: 24px !important;
+            left: auto !important;
             bottom: 84px !important;
-            right: auto !important;
             width: 380px !important;
             max-width: calc(100vw - 32px) !important;
             height: min(520px, calc(100vh - 110px)) !important;
@@ -148,7 +148,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
 
           @media (max-width: 500px) {
             .sheet {
-              left: 10px !important;
+              right: 10px !important;
+              left: auto !important;
               bottom: 74px !important;
               width: calc(100vw - 20px) !important;
               max-width: calc(100vw - 20px) !important;
