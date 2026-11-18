@@ -96,8 +96,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
             display: flex !important;
             flex-direction: column !important;
             position: fixed !important;
-            right: 24px !important;
-            left: auto !important;
+            left: 24px !important;
+            right: auto !important;
             bottom: 84px !important;
             width: 380px !important;
             max-width: calc(100vw - 32px) !important;
@@ -148,8 +148,8 @@ export function ElevenLabsWidget({ agentId = "agent_4401kpn73yzzfjjr8pg03cvr322w
 
           @media (max-width: 500px) {
             .sheet {
-              right: 10px !important;
-              left: auto !important;
+              left: 10px !important;
+              right: auto !important;
               bottom: 74px !important;
               width: calc(100vw - 20px) !important;
               max-width: calc(100vw - 20px) !important;
