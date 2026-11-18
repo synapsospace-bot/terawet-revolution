@@ -312,7 +312,7 @@ function Home() {
   const [modalSubmitting, setModalSubmitting] = useState(false);
   const [modalSuccess, setModalSuccess] = useState(false);
 
-  const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/1hx4kbz4a0d4788aggfnvuleuem8gzbb";
+  const CRM_WEBHOOK_URL = "https://primary-production-40b5f7f7.up.railway.app/webhook/terawet-crm";
 
   const sendInquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -328,7 +328,7 @@ function Home() {
     setFormSuccess(false);
 
     try {
-      const response = await fetch(MAKE_WEBHOOK_URL, {
+      const response = await fetch(CRM_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -371,7 +371,7 @@ function Home() {
     setModalSuccess(false);
 
     try {
-      const response = await fetch(MAKE_WEBHOOK_URL, {
+      const response = await fetch(CRM_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
